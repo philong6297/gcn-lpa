@@ -49,18 +49,21 @@ class Layer(object):
 
 
 class GCNLayer(Layer):
-    def __init__(self, input_dim, raw_input_dim, output_dim, adj, dropout, sparse=False, feature_nnz=0, act=tf.nn.relu, name=None):
+    def __init__(self, input_dim, raw_input_dim, output_dim, adj, dropout, res,
+                 sparse=False, feature_nnz=0, act=tf.nn.relu, name=None):
         super(GCNLayer, self).__init__(name)
         self.adj = adj
         self.dropout = dropout
         self.sparse = sparse
         self.feature_nnz = feature_nnz
         self.act = act
+        self.res = res
         with tf.variable_scope(self.name):
             self.weights = glorot([input_dim, output_dim], name='weight')
-            self.res_weights = glorot(
-                [raw_input_dim, output_dim], name='res_weight')
             self.vars = [self.weights]
+            if self.res:
+                self.res_weights = glorot(
+                    [raw_input_dim, output_dim], name='res_weight')
 
     def _call(self, inputs, raw_inputs):
         x = inputs
@@ -68,7 +71,8 @@ class GCNLayer(Layer):
             x, 1 - self.dropout, self.feature_nnz) if self.sparse else tf.nn.dropout(x, 1 - self.dropout)
         x = dot(x, self.weights, sparse=self.sparse)
         x = dot(self.adj, x, sparse=True)
-        x += dot(raw_inputs, self.res_weights, True)
+        if self.res:
+            x += dot(raw_inputs, self.res_weights, True)
         return self.act(x)
 
 

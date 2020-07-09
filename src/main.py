@@ -31,7 +31,9 @@ parser.add_argument('--lpa_weight', type=float, default=10,
                     help='weight of LP regularization')
 parser.add_argument('--dropout', type=float, default=0.4, help='dropout rate')
 parser.add_argument('--lr', type=float, default=0.05, help='learning rate')
-parser.add_argument('--vis', type=bool, default=False, help='Visualize graph')
+parser.add_argument('--res', type=bool, default=False, help='Use skip-connection')
+parser.add_argument('--write_label', type=bool, default=True, help='write predicted labels for c++ app (cora only)')
+parser.add_argument('--vis', type=bool, default=False, help='Visualize graph (cora only)')
 
 # # citeseer
 # parser.add_argument('--dataset', type=str, default='citeseer', help='which dataset to use')
@@ -43,7 +45,9 @@ parser.add_argument('--vis', type=bool, default=False, help='Visualize graph')
 # parser.add_argument('--lpa_weight', type=float, default=1, help='weight of LP regularization')
 # parser.add_argument('--dropout', type=float, default=0.2, help='dropout rate')
 # parser.add_argument('--lr', type=float, default=0.2, help='learning rate')
-# parser.add_argument('--vis', type=bool,default=False,help='Visualize graph')
+# parser.add_argument('--res', type=bool, default=True, help='Use skip-connection')
+# parser.add_argument('--write_label', type=bool, default=False, help='write predicted labels for c++ app (cora only)')
+# parser.add_argument('--vis', type=bool, default=False, help='Visualize graph (cora only)')
 
 # pubmed
 # parser.add_argument('--dataset', type=str, default='pubmed', help='which dataset to use')
@@ -55,7 +59,9 @@ parser.add_argument('--vis', type=bool, default=False, help='Visualize graph')
 # parser.add_argument('--lpa_weight', type=float, default=1, help='weight of LP regularization')
 # parser.add_argument('--dropout', type=float, default=0.2, help='dropout rate')
 # parser.add_argument('--lr', type=float, default=0.1, help='learning rate')
-# parser.add_argument('--vis', type=bool,default=False,help='Visualize graph')
+# parser.add_argument('--res', type=bool, default=True, help='Use skip-connection')
+# parser.add_argument('--write_label', type=bool, default=False, help='write predicted labels for c++ app (cora only)')
+# parser.add_argument('--vis', type=bool, default=False, help='Visualize graph (cora only)')
 
 
 t = time()

@@ -33,14 +33,16 @@ class GCN_LPA(object):
         hidden_list = []
 
         if self.args.gcn_layer == 1:
-            gcn_layer = GCNLayer(input_dim=feature_dim, raw_input_dim=feature_dim, output_dim=label_dim, adj=self.normalized_adj,
-                                 dropout=self.dropout, sparse=True, feature_nnz=feature_nnz, act=lambda x: x)
+            gcn_layer = GCNLayer(input_dim=feature_dim, raw_input_dim=feature_dim, output_dim=label_dim, 
+                                adj=self.normalized_adj, dropout=self.dropout, res=self.args.res,
+                                sparse=True, feature_nnz=feature_nnz, act=lambda x: x)
             self.outputs = gcn_layer(self.features, raw_inputs=self.features)
             self.vars.extend(gcn_layer.vars)
         else:
             # first input layer is sparse
-            self.gcn_layer = GCNLayer(input_dim=feature_dim, raw_input_dim=feature_dim, output_dim=self.args.dim, adj=self.normalized_adj,
-                                      dropout=self.dropout, sparse=True, feature_nnz=feature_nnz)
+            self.gcn_layer = GCNLayer(input_dim=feature_dim, raw_input_dim=feature_dim, 
+                                    output_dim=self.args.dim, adj=self.normalized_adj,
+                                    dropout=self.dropout, res=self.args.res, sparse=True, feature_nnz=feature_nnz)
             # 1st hidden layer
             hidden = self.gcn_layer(self.features, raw_inputs=self.features)
             hidden_list.append(hidden)
@@ -48,15 +50,17 @@ class GCN_LPA(object):
             self.vars.extend(self.gcn_layer.vars)
 
             for _ in range(self.args.gcn_layer - 2):
-                gcn_layer = GCNLayer(input_dim=self.args.dim, raw_input_dim=feature_dim, output_dim=self.args.dim, adj=self.normalized_adj,
-                                     dropout=self.dropout)
+                gcn_layer = GCNLayer(input_dim=self.args.dim, raw_input_dim=feature_dim, 
+                                    output_dim=self.args.dim, adj=self.normalized_adj,
+                                    dropout=self.dropout, res = self.args.res)
                 hidden = gcn_layer(hidden_list[-1], raw_inputs=self.features)
                 hidden_list.append(hidden)
                 self.vars.extend(gcn_layer.vars)
 
             # last hidden layer dont use relu
-            gcn_layer = GCNLayer(input_dim=self.args.dim, raw_input_dim=feature_dim, output_dim=label_dim, adj=self.normalized_adj,
-                                 dropout=self.dropout, act=lambda x: x)
+            gcn_layer = GCNLayer(input_dim=self.args.dim, raw_input_dim=feature_dim, 
+                                output_dim=label_dim, adj=self.normalized_adj,
+                                dropout=self.dropout, res = self.args.res, act=lambda x: x)
             self.outputs = gcn_layer(hidden_list[-1], raw_inputs=self.features)
             self.vars.extend(gcn_layer.vars)
 

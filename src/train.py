@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import networkx as nx
-
+import json
 
 def print_statistics(features, labels, adj):
     n_nodes = features[2][0]
@@ -95,16 +95,36 @@ def train(args, data, batch_test=False):
                 final_test_acc = test_acc
 
             if not batch_test:
-                print('epoch %d   train loss: %.4f  acc: %.4f   val loss: %.4f  acc: %.4f   test loss: %.4f  acc: %.4f'
-                      % (epoch, train_loss, train_acc, val_loss, val_acc, test_loss, test_acc))
-                # print(adj[1])
+                print('epoch %d   train loss: %.4f  acc: %.4f   val loss: %.4f  acc: %.4f'
+                      % (epoch, train_loss, train_acc, val_loss, val_acc))
 
         if not batch_test:
-            print('final test acc: %.4f' % final_test_acc)
-            print('best val acc: %.4f' % best_val_acc)
+            print('-'*30)
+            print('Final Test Acc: %.4f' % final_test_acc)
+            print('Best Val Acc: %.4f' % best_val_acc)
         else:
             return final_test_acc
-        if args.vis:
+        if args.vis or args.write_label:
             output_labels = sess.run(
                 [model.predict()], feed_dict=get_feed_dict(test_mask, 0.0))
-            visualize(output_labels[0], graph, final_test_acc)
+            if args.vis:
+                visualize(output_labels[0], graph, final_test_acc)
+            if args.write_label:
+                print('-'*30)
+                print('Writing predicted label...')
+                with open('../data/cora/mapping.json') as f_in:
+                    mapping_paper_id = json.load(f_in)
+                label_id_dict = {
+                                0: 'Case Based', 1: 'Genetic Algorithms',
+                                2: 'Neural Networks', 3: 'Probabilistic Methods',
+                                4: 'Reinforcement Learning', 5: 'Rule Learning',
+                                6: 'Theory'
+                                }
+                predicted_label_file_name = 'gcn_lpa_skip_label.json' if args.res else 'gcn_lpa_label.json'
+                paper_id_label_dict = dict()
+                for i, predicted_label in enumerate(output_labels[0]):
+                    paper_id_label_dict[mapping_paper_id[str(i)]] = label_id_dict[predicted_label]
+                with open('../result/'+predicted_label_file_name,'w') as f_out:
+                    json.dump(paper_id_label_dict, f_out, indent=4, sort_keys=True)
+                print('Done')
+                    
