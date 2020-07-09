@@ -1,0 +1,6 @@
+networkx
+numpy
+scipy
+tensorflow==1.15.0
+matplotlib
+sklearn
